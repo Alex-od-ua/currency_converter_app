@@ -2,6 +2,7 @@
   "name": "currency_converter_app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://Alex-od-ua.github.io/currency_converter_app/",
   "dependencies": {
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
