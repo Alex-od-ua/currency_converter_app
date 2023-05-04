@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { CurrencyForm } from "../components/CurrencyForm/CurrencyForm";
+import Loader from "components/Loder/Loader";
 import { searchRates } from "services/api";
 
 import "./App.css";
@@ -27,14 +28,15 @@ function App() {
     };
 
     fetchRates();
-  }, []);
+  }, [rates]);
 
   console.log(rates[0]);
 
   return (
     <div className="App">
       {error && <p>{error}</p>}
-      {/* {loading && <Loader/>} */}
+      {loading && <Loader />}
+
       <CurrencyForm
         value={0}
         currency="UAH"
