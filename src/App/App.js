@@ -6,7 +6,18 @@ import { searchRates } from "services/api";
 
 import "./App.css";
 
+const initialState = {
+  fromCurrency: "UAH",
+  toCurrency: "USD",
+  price: 0,
+  toPrice: 0,
+};
+
 function App() {
+  const [fromCurrency, setFromCurrency] = useState("UAH");
+  const [toCurrency, setToCurrency] = useState("USD");
+  const [fromPrice, setFromPrice] = useState(0);
+  const [toPrice, setToPrice] = useState(0);
   const [rates, setRates] = useState([]);
   const [loading, setLoading] = useState();
   const [error, setError] = useState();
@@ -20,6 +31,8 @@ function App() {
           setRates(result);
         } catch (error) {
           setError(error.data.message);
+          console.log(error);
+          alert("Oooops, something went wrong :(");
         } finally {
           setLoading(false);
           console.log(rates);
@@ -30,7 +43,24 @@ function App() {
     fetchRates();
   }, [rates]);
 
-  console.log(rates[0]);
+  const onChangeFromPrice = (value) => {
+    // const price = rates.cc[fromCurrency] / value;
+    // const result = price * rates.cc[toCurrency];
+
+    console.log(value);
+    console.log(rates.cc);
+    // console.log(result);
+
+    console.log(rates[0].cc);
+    setFromPrice(value);
+    // setToPrice(result);
+  };
+
+  const onChangeToPrice = (value) => {
+    setToPrice(value);
+  };
+
+  // console.log(rates[0].txt);
 
   return (
     <div className="App">
@@ -38,11 +68,17 @@ function App() {
       {loading && <Loader />}
 
       <CurrencyForm
-        value={0}
-        currency="UAH"
-        onChangeCurrency={(cur) => console.log(cur)}
+        value={fromPrice}
+        currency={fromCurrency}
+        onChangeCurrency={setFromCurrency}
+        onChangeValue={onChangeFromPrice}
       />
-      <CurrencyForm value={0} currency="USD" />
+      <CurrencyForm
+        value={toPrice}
+        currency={toCurrency}
+        onChangeCurrency={setToCurrency}
+        onChangeValue={onChangeToPrice}
+      />
     </div>
   );
 }
