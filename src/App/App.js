@@ -6,90 +6,84 @@ import { searchRates } from "services/api";
 
 import "./App.css";
 
-// const initialState = {
-//   fromCurrency: "UAH",
-//   toCurrency: "USD",
-//   fromPrice: 0,
-//   toPrice: 0,
-// };
-
 function App() {
   const [fromCurrency, setFromCurrency] = useState("UAH");
   const [toCurrency, setToCurrency] = useState("USD");
 
   const [fromPrice, setFromPrice] = useState(0);
-  const [toPrice, setToPrice] = useState(0);
+  const [toPrice, setToPrice] = useState(1); // (1) -> make start uah -> usd currency
 
-  const [rates, setRates] = useState([]);
-  // const [rates2, setRates2] = useState([]);
+  // const [rates, setRates] = useState([]);
+  const ratesRef = useRef([]);
+
   const [loading, setLoading] = useState();
   const [error, setError] = useState();
 
-  const isFirstRender = useRef(true);
-
-  console.log(fromCurrency);
-  console.log(toCurrency);
+  const isFirstRenderFromPrice = useRef(true);
+  const isFirstRenderToPrice = useRef(true);
 
   useEffect(() => {
     const fetchRates = async () => {
-      // if (rates.length === 0) {
       try {
         setLoading(true);
         const result = await searchRates(fromCurrency);
-        // const result2 = await searchRates(toCurrency);
-        setRates(result);
-        // setRates2(result2);
+
+        // setRates(result);
+        ratesRef.current = result;
+        onChangeToPrice(1); // make start uah -> usd currency
       } catch (error) {
-        setError(error.data.message);
+        setError(error);
         console.log(error);
         alert("Oooops, something went wrong :(");
       } finally {
         setLoading(false);
-        // console.log(rates);
-        // console.log(rates2);
       }
     };
-    // };
 
     fetchRates();
   }, [fromCurrency]);
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    if (isFirstRenderFromPrice.current) {
+      isFirstRenderFromPrice.current = false;
       return;
     }
 
     onChangeFromPrice(fromPrice);
+  }, [fromCurrency]);
+
+  useEffect(() => {
+    if (isFirstRenderToPrice.current) {
+      isFirstRenderToPrice.current = false;
+      return;
+    }
+
+    onChangeToPrice(toPrice);
   }, [toCurrency]);
 
   const onChangeFromPrice = (value) => {
-    // const price = rates.conversion_rates[toCurrency] / value;
-    const result = value * rates.conversion_rates[toCurrency];
+    const result =
+      (ratesRef.current.conversion_rates[toCurrency] /
+        ratesRef.current.conversion_rates[fromCurrency]) *
+      value;
 
-    // console.log(value);
-    console.log(rates.conversion_rates);
-    // console.log(price);
-    console.log(result);
+    setToPrice(0);
+    setFromPrice(0);
 
-    setToPrice(result);
+    setToPrice(Math.floor(result * 100) / 100); // or toFixed(2)
     setFromPrice(value);
   };
 
-  // const onChangeFromCurrency = (cur) => {
-  //   setFromCurrency(cur);
-  //   onChangeFromPrice(fromPrice);
-  // };
-
   const onChangeToPrice = (value) => {
     const result =
-      (rates.conversion_rates[fromCurrency] /
-        rates.conversion_rates[toCurrency]) *
+      (ratesRef.current.conversion_rates[fromCurrency] /
+        ratesRef.current.conversion_rates[toCurrency]) *
       value;
 
-    console.log(result);
+    setFromPrice(0);
+    setToPrice(0);
 
-    setFromPrice(result);
+    setFromPrice(Math.floor(result * 100) / 100); // or toFixed(2)
     setToPrice(value);
   };
 
